@@ -1,0 +1,27 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# Environment files
+.env
+
+# SSH Keys
+*.pem
+*.key
+
+# VS Code
+.vscode/
+
+# Docker
+*.pid
+
+#prevent action-runner
+actions-runner/
+*.tar.gz
+_work/
