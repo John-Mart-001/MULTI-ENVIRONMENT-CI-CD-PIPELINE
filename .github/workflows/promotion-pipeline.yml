@@ -1,0 +1,101 @@
+name: Multi-Environment Promotion Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t multi-env-nginx:${{ github.sha }} \
+            -t multi-env-nginx:latest \
+            ./app
+
+      - name: Verify Image
+        run: docker images
+
+  deploy-development:
+
+    needs: build
+
+    runs-on: self-hosted
+
+    environment:
+      name: Development
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Deploy Development
+        run: |
+          docker compose \
+            -f compose/docker-compose.dev.yml \
+            up -d
+
+      - name: Verify Development
+        run: |
+          curl --fail http://localhost:8081
+
+
+            deploy-staging:
+
+    needs: deploy-development
+
+    runs-on: self-hosted
+
+    environment:
+      name: Staging
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Deploy Staging
+        run: |
+          docker compose \
+            -f compose/docker-compose.staging.yml \
+            up -d
+
+      - name: Verify Staging
+        run: |
+          curl --fail http://localhost:8082
+
+
+            deploy-production:
+
+    needs: deploy-staging
+
+    runs-on: self-hosted
+
+    environment:
+      name: Production
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Deploy Production
+        run: |
+          docker compose \
+            -f compose/docker-compose.prod.yml \
+            up -d
+
+      - name: Verify Production
+        run: |
+          curl --fail http://localhost:8083
