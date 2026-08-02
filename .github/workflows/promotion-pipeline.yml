@@ -3,19 +3,15 @@ name: Multi-Environment Promotion Pipeline
 on:
   push:
     branches:
-      - master
+      - main
 
 permissions:
   contents: read
 
 jobs:
-
   build:
-
     runs-on: self-hosted
-
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -30,16 +26,11 @@ jobs:
         run: docker images
 
   deploy-development:
-
     needs: build
-
     runs-on: self-hosted
-
     environment:
       name: Development
-
     steps:
-
       - uses: actions/checkout@v4
 
       - name: Deploy Development
@@ -52,18 +43,12 @@ jobs:
         run: |
           curl --fail http://localhost:8081
 
-
-            deploy-staging:
-
+  deploy-staging:
     needs: deploy-development
-
     runs-on: self-hosted
-
     environment:
       name: Staging
-
     steps:
-
       - uses: actions/checkout@v4
 
       - name: Deploy Staging
@@ -76,18 +61,12 @@ jobs:
         run: |
           curl --fail http://localhost:8082
 
-
-            deploy-production:
-
+  deploy-production:
     needs: deploy-staging
-
     runs-on: self-hosted
-
     environment:
       name: Production
-
     steps:
-
       - uses: actions/checkout@v4
 
       - name: Deploy Production
@@ -99,3 +78,4 @@ jobs:
       - name: Verify Production
         run: |
           curl --fail http://localhost:8083
+
